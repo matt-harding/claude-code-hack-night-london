@@ -13,6 +13,7 @@
   "dependencies": {
     "@clerk/express": "^1.7.70",
     "@clerk/mcp-tools": "^0.3.1",
+    "@hello-pangea/dnd": "^18.0.1",
     "@modelcontextprotocol/sdk": "^1.26.0",
     "@supabase/supabase-js": "^2.95.3",
     "@t3-oss/env-core": "^0.13.10",

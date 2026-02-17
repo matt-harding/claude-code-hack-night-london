@@ -1,222 +1,119 @@
 import "@/index.css";
-import { useState } from "react";
-import { mountWidget, useLayout, useDisplayMode } from "skybridge/web";
+import { useEffect, useRef } from "react";
+import { mountWidget, useLayout, useDisplayMode, useWidgetState } from "skybridge/web";
 import { useToolInfo, useCallTool } from "../helpers";
-import { Check, Trash2, Plus, Maximize2, Minimize2, Calendar } from "lucide-react";
-
-const PRIORITY_COLORS: Record<string, string> = {
-  high: "#ef4444",
-  medium: "#f59e0b",
-  low: "#22c55e",
-};
-
-const PRIORITY_LABELS: Record<string, string> = {
-  high: "High",
-  medium: "Med",
-  low: "Low",
-};
+import { Maximize2, Minimize2 } from "lucide-react";
+import { type Task, type Status, getTaskStatus } from "../components/types";
+import { LoadingScreen } from "../components/LoadingScreen";
+import { AddTaskForm } from "../components/AddTaskForm";
+import { KanbanBoard } from "../components/KanbanBoard";
+import { TaskList } from "../components/TaskList";
 
 function ManageTasks() {
   const { output, isPending } = useToolInfo<"manage-tasks">();
-  const { callToolAsync, isPending: isMutating } = useCallTool("manage-tasks");
+  const { callToolAsync } = useCallTool("manage-tasks");
   const { theme } = useLayout();
   const isDark = theme === "dark";
   const [displayMode, requestDisplayMode] = useDisplayMode();
 
-  const [newTitle, setNewTitle] = useState("");
-  const [newPriority, setNewPriority] = useState<"low" | "medium" | "high">("medium");
-  const [newDueDate, setNewDueDate] = useState("");
-  const [filter, setFilter] = useState<"all" | "pending" | "completed">("all");
-  const [localTasks, setLocalTasks] = useState<NonNullable<typeof output>["tasks"] | null>(null);
+  const [widgetState, setWidgetState] = useWidgetState<{ tasks: Task[] }>();
+  const mutationCounter = useRef(0);
 
-  if (isPending) {
-    return (
-      <div className={`todo-container ${isDark ? "dark" : "light"}`}>
-        <div className="loading">Loading tasks...</div>
-      </div>
-    );
+  const safeTasks = (prev: { tasks?: Task[] } | null | undefined): Task[] =>
+    prev?.tasks ?? [];
+
+  // Sync widget state when server output changes
+  useEffect(() => {
+    if (output?.tasks) {
+      setWidgetState(() => ({ tasks: output.tasks as Task[] }));
+    }
+  }, [output?.tasks]);
+
+  if (isPending || widgetState?.tasks === undefined) {
+    return <LoadingScreen isDark={isDark} />;
   }
 
-  const tasks = localTasks ?? output?.tasks ?? [];
-  const pendingCount = tasks.filter((t) => !t.completed).length;
-  const completedCount = tasks.filter((t) => t.completed).length;
-
-  const filteredTasks = tasks.filter((t) => {
-    if (filter === "pending") return !t.completed;
-    if (filter === "completed") return t.completed;
-    return true;
-  });
+  const tasks = widgetState.tasks;
+  const todoCount = tasks.filter((t) => getTaskStatus(t) === "todo").length;
+  const inProgressCount = tasks.filter((t) => getTaskStatus(t) === "in_progress").length;
+  const doneCount = tasks.filter((t) => getTaskStatus(t) === "done").length;
 
   const syncWithServer = async (args: Parameters<typeof callToolAsync>[0]) => {
+    const id = ++mutationCounter.current;
     const result = await callToolAsync(args);
-    if (result?.structuredContent?.tasks) {
-      setLocalTasks(result.structuredContent.tasks);
+    if (id === mutationCounter.current && result?.structuredContent?.tasks) {
+      setWidgetState(() => ({ tasks: result.structuredContent.tasks as Task[] }));
     }
   };
 
-  const handleAdd = () => {
-    if (!newTitle.trim()) return;
-    const title = newTitle.trim();
-    const priority = newPriority;
-    const dueDate = newDueDate || null;
-
-    // Optimistic: add a temporary task at the top
-    setLocalTasks([
-      {
-        id: `temp-${Date.now()}`,
-        title,
-        completed: false,
-        priority,
-        dueDate,
-        createdAt: new Date().toISOString(),
-      },
-      ...tasks,
-    ]);
-    setNewTitle("");
-    setNewDueDate("");
-
-    // Sync: server returns the real list with proper IDs
+  const handleAdd = (title: string, priority: "low" | "medium" | "high", dueDate: string | null) => {
+    setWidgetState((prev) => ({
+      tasks: [
+        {
+          id: `temp-${Date.now()}`,
+          title,
+          completed: false,
+          priority,
+          dueDate,
+          createdAt: new Date().toISOString(),
+          status: "todo",
+        },
+        ...safeTasks(prev),
+      ],
+    }));
     syncWithServer({ actions: [{ type: "add", title, priority, dueDate: dueDate ?? undefined }] });
   };
 
-  const handleToggle = (taskId: string) => {
-    // Optimistic: flip completed locally
-    setLocalTasks(tasks.map((t) => (t.id === taskId ? { ...t, completed: !t.completed } : t)));
-    syncWithServer({ actions: [{ type: "toggle", taskId }] });
+  const handleMove = (taskId: string, status: Status) => {
+    setWidgetState((prev) => ({
+      tasks: safeTasks(prev).map((t) =>
+        t.id === taskId ? { ...t, status, completed: status === "done" } : t
+      ),
+    }));
+    syncWithServer({ actions: [{ type: "move", taskId, status }] });
   };
 
   const handleDelete = (taskId: string) => {
-    // Optimistic: remove locally
-    setLocalTasks(tasks.filter((t) => t.id !== taskId));
+    setWidgetState((prev) => ({
+      tasks: safeTasks(prev).filter((t) => t.id !== taskId),
+    }));
     syncWithServer({ actions: [{ type: "delete", taskId }] });
   };
 
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return null;
-    return new Date(dateStr).toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-    });
-  };
+  const isFullscreen = displayMode === "fullscreen";
 
   return (
     <div
-      className={`todo-container ${isDark ? "dark" : "light"}`}
-      data-llm={`${pendingCount} pending, ${completedCount} completed tasks`}
+      className={`todo-container ${isDark ? "dark" : "light"} ${isFullscreen ? "fullscreen" : ""}`}
+      data-llm={`${todoCount} todo, ${inProgressCount} in progress, ${doneCount} done`}
     >
+        Heyddddddddd
       <div className="todo-header">
-        <h2>My Tasks</h2>
+        <h2><span className="brand-icon">&#9889;</span> Claude Hack Night</h2>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div className="todo-stats">
-            <span className="stat pending-stat">{pendingCount} pending</span>
-            <span className="stat completed-stat">{completedCount} done</span>
+            <span className="stat" style={{ background: "rgba(59,130,246,0.15)", color: "#3b82f6" }}>{todoCount}</span>
+            <span className="stat pending-stat">{inProgressCount}</span>
+            <span className="stat completed-stat">{doneCount}</span>
           </div>
           <button
             className="display-mode-btn"
-            onClick={() =>
-              requestDisplayMode(displayMode === "inline" ? "fullscreen" : "inline")
-            }
+            onClick={() => requestDisplayMode(isFullscreen ? "inline" : "fullscreen")}
             aria-label="Toggle display mode"
-            title={displayMode === "inline" ? "Fullscreen" : "Minimize"}
+            title={isFullscreen ? "Minimize" : "Fullscreen"}
           >
-            {displayMode === "inline" ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
+            {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
           </button>
         </div>
       </div>
 
-      {/* Add task form */}
-      <div className="add-form">
-        <input
-          type="text"
-          className="add-input"
-          placeholder="Add a new task..."
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-          disabled={isMutating}
-        />
-        <div className="add-options">
-          <select
-            className="priority-select"
-            value={newPriority}
-            onChange={(e) => setNewPriority(e.target.value as "low" | "medium" | "high")}
-          >
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
-          <input
-            type="date"
-            className="date-input"
-            value={newDueDate}
-            onChange={(e) => setNewDueDate(e.target.value)}
-          />
-          <button className="add-btn" onClick={handleAdd} disabled={isMutating || !newTitle.trim()}>
-            <Plus size={14} /> Add
-          </button>
-        </div>
-      </div>
+      <AddTaskForm onAdd={handleAdd} />
 
-      {/* Filter tabs */}
-      <div className="filter-tabs">
-        {(["all", "pending", "completed"] as const).map((f) => (
-          <button
-            key={f}
-            className={`filter-tab ${filter === f ? "active" : ""}`}
-            onClick={() => setFilter(f)}
-          >
-            {f.charAt(0).toUpperCase() + f.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      {/* Task list */}
-      <div className="task-list">
-        {filteredTasks.length === 0 ? (
-          <div className="empty">
-            {filter === "all" ? "No tasks yet. Add one above!" : `No ${filter} tasks.`}
-          </div>
-        ) : (
-          filteredTasks.map((task) => (
-            <div
-              key={task.id}
-              className={`task-item ${task.completed ? "completed" : ""}`}
-              data-llm={`Task: "${task.title}" - ${task.completed ? "done" : "pending"}, ${task.priority} priority`}
-            >
-              <button
-                className="checkbox"
-                onClick={() => handleToggle(task.id)}
-                disabled={isMutating}
-                aria-label={task.completed ? "Mark incomplete" : "Mark complete"}
-              >
-                {task.completed && <Check size={12} />}
-              </button>
-              <div className="task-content">
-                <span className="task-title">{task.title}</span>
-                <div className="task-meta">
-                  <span
-                    className="priority-badge"
-                    style={{ backgroundColor: PRIORITY_COLORS[task.priority] }}
-                  >
-                    {PRIORITY_LABELS[task.priority]}
-                  </span>
-                  {task.dueDate && (
-                    <span className="due-date"><Calendar size={10} /> {formatDate(task.dueDate)}</span>
-                  )}
-                </div>
-              </div>
-              <button
-                className="delete-btn"
-                onClick={() => handleDelete(task.id)}
-                disabled={isMutating}
-                aria-label="Delete task"
-              >
-                <Trash2 size={14} />
-              </button>
-            </div>
-          ))
-        )}
-      </div>
+      {isFullscreen ? (
+        <KanbanBoard tasks={tasks} onMove={handleMove} onDelete={handleDelete} />
+      ) : (
+        <TaskList tasks={tasks} onMove={handleMove} onDelete={handleDelete} />
+      )}
     </div>
   );
 }
