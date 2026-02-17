@@ -4,6 +4,20 @@ A task management app built with [Skybridge](https://docs.skybridge.tech), featu
 
 **Try it now in Claude:** add `https://task-manager.alpic.live/mcp` as a remote MCP server in your Claude settings. Requires a Pro, Team, Max, or Enterprise account.
 
+## Hack Night Theme
+
+**Build an app that solves an everyday "at work" issue.**
+
+Use this repo as a starting point and build your own MCP app. Here are some ideas to get you started:
+
+- 🔖 **Bookmark Brain** — Save links with your own annotations, retrieve them later by describing what you vaguely remember
+- ⏰ **Deadline Radar** — Store upcoming deadlines with context, ask "what's due this week?"
+- 👋 **Learn Your Teammates** — For newcomers in a company, uses the model to play a "Time's Up" game of who's who
+- 💡 **Pitch Pile** — Dump 'someday' ideas, user feedback, emails, and call notes that shouldn't clutter the roadmap but need to be searchable. Like, aggregate, and sort
+- 🔤 **Acronym Atlas** — A repository for company-specific jargon and internal project codenames that confuse every new hire
+- 📚 **Learning Ledger** — A DB of posts or articles you want to read. Make summaries, find patterns, and quiz yourself
+- 🍕 **Rate Your Nearby Restaurants** — Rate places around the office and get suggestions for where to eat today
+
 ## Prerequisites
 
 ### Node.js (v24.13+)
