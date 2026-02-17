@@ -2,6 +2,8 @@
 
 A task management app built with [Skybridge](https://docs.skybridge.tech), featuring a kanban board with drag-and-drop, status management, and real-time sync via Supabase.
 
+**Try it now in Claude:** add `https://task-manager.alpic.live/mcp` as a remote MCP server in your Claude settings. Requires a Pro, Team, Max, or Enterprise account.
+
 ## Prerequisites
 
 ### Node.js (v24.13+)
