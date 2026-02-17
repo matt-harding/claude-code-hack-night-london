@@ -115,6 +115,14 @@ supabase migration list
 
 Migrations live in `supabase/migrations/`. After editing or adding a migration file, run `supabase db push` to apply it to your remote database.
 
+## Deploy to Production
+
+Use [Alpic](https://alpic.ai/) to deploy your app to production:
+
+[![Deploy on Alpic](https://assets.alpic.ai/button.svg)](https://app.alpic.ai/new/clone?repositoryUrl=https%3A%2F%2Fgithub.com%2Falpic-ai%2Fclaude-hacknight-starter-20-02-2026)
+
+Then add your deployed URL with `/mcp` appended (e.g. `https://your-app-name.alpic.live/mcp`) as a remote MCP server in Claude settings.
+
 ## Resources
 
 - [Skybridge Documentation](https://docs.skybridge.tech/)
