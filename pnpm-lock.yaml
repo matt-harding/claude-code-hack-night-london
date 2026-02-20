@@ -45,8 +45,8 @@ importers:
         specifier: ^19.2.4
         version: 19.2.4(react@19.2.4)
       skybridge:
-        specifier: ^0.31.4
-        version: 0.31.4(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))(@skybridge/devtools@0.31.4)(@types/react@19.2.14)(nodemon@3.1.11)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))(vite@7.3.1(@types/node@25.2.3)(tsx@4.21.0))
+        specifier: '>=0.33.0 <1.0.0'
+        version: 0.33.0(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))(@skybridge/devtools@0.33.0)(@types/react@19.2.14)(nodemon@3.1.11)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))(vite@7.3.1(@types/node@25.2.3)(tsx@4.21.0))
       vite:
         specifier: ^7.3.1
         version: 7.3.1(@types/node@25.2.3)(tsx@4.21.0)
@@ -55,8 +55,8 @@ importers:
         version: 4.3.6
     devDependencies:
       '@skybridge/devtools':
-        specifier: '>=0.26.1 <1.0.0'
-        version: 0.31.4
+        specifier: '>=0.33.0 <1.0.0'
+        version: 0.33.0
       '@types/cors':
         specifier: ^2.8.19
         version: 2.8.19
@@ -458,6 +458,9 @@ packages:
   '@posthog/core@1.22.0':
     resolution: {integrity: sha512-WkmOnq95aAOu6yk6r5LWr5cfXsQdpVbWDCwOxQwxSne8YV6GuZET1ziO5toSQXgrgbdcjrSz2/GopAfiL6iiAA==}
 
+  '@posthog/core@1.23.1':
+    resolution: {integrity: sha512-GViD5mOv/mcbZcyzz3z9CS0R79JzxVaqEz4sP5Dsea178M/j3ZWe6gaHDZB9yuyGfcmIMQ/8K14yv+7QrK4sQQ==}
+
   '@rolldown/pluginutils@1.0.0-rc.3':
     resolution: {integrity: sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q==}
 
@@ -586,8 +589,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@skybridge/devtools@0.31.4':
-    resolution: {integrity: sha512-hg6ywyyIqWkVLtTFS2k7EXQyHxfDuDOpjbf1WEL2DmrJ5oIgKsFgkNX0G8SP6nrVigA3chdexwU+KlPR/lBiyg==}
+  '@skybridge/devtools@0.33.0':
+    resolution: {integrity: sha512-rIYHaPHAaHMVuDeJnCdDWnaQM5b65fQwDcOUoGZ3XQXYeK6zotTwTsuyXjKOdz4R6B+ZNJBXDPEtzZhdVFcsrw==}
 
   '@stablelib/base64@1.0.1':
     resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
@@ -1138,13 +1141,13 @@ packages:
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
 
-  ink@6.7.0:
-    resolution: {integrity: sha512-dhB16KfdTO8yYwF2K0E4wPXpL88tdrjjB6w44AZ0ljSktYoUQQcxccq9KL1vpRhk8JIa0A7B7zvjajHqI42teA==}
+  ink@6.8.0:
+    resolution: {integrity: sha512-sbl1RdLOgkO9isK42WCZlJCFN9hb++sX9dsklOvfd1YQ3bQ2AiFu12Q6tFlr0HvEUvzraJntQCCpfEoUe9DSzA==}
     engines: {node: '>=20'}
     peerDependencies:
       '@types/react': '>=19.0.0'
       react: '>=19.0.0'
-      react-devtools-core: ^6.1.2
+      react-devtools-core: '>=6.1.2'
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -1383,6 +1386,10 @@ packages:
     resolution: {integrity: sha512-0QnWVOZAPwEAlp+r3r0jIGfk2IaNYM/2YnEJJhBMJZXs4LpHcTu7mX42l+e95o9xX87YpVuZU0kOkmtQUxgnOA==}
     engines: {node: ^20.20.0 || >=22.22.0}
 
+  posthog-node@5.24.17:
+    resolution: {integrity: sha512-mdb8TKt+YCRbGQdYar3AKNUPCyEiqcprScF4unYpGALF6HlBaEuO6wPuIqXXpCWkw4VclJYCKbb6lq6pH6bJeA==}
+    engines: {node: ^20.20.0 || >=22.22.0}
+
   proxy-addr@2.0.7:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
     engines: {node: '>= 0.10'}
@@ -1527,8 +1534,8 @@ packages:
   sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
 
-  skybridge@0.31.4:
-    resolution: {integrity: sha512-uMJR7dPn327iguEaW4IfYZEyeR9LY/EO7P4ceiQ3yEspyi771o1mnCEPJytXsG1n1OrLggnxQydO3bHj4AV6tg==}
+  skybridge@0.33.0:
+    resolution: {integrity: sha512-qZQ49PuhA0JhotXSlv/XYs+XF74MXYE5AaBhqP+60H//fKMMB0Yni1DGTSz575/YQUaWXNIGI2wxqJ6QtU4nzA==}
     hasBin: true
     peerDependencies:
       '@modelcontextprotocol/sdk': '>=1.0.0'
@@ -1541,6 +1548,10 @@ packages:
   slice-ansi@7.1.2:
     resolution: {integrity: sha512-iOBWFgUX7caIZiuutICxVgX1SdxwAVFFKwt1EvMYYec/NWO5meOJ6K5uQxhrYBdQJne4KxiqZc+KptFOWFSI9w==}
     engines: {node: '>=18'}
+
+  slice-ansi@8.0.0:
+    resolution: {integrity: sha512-stxByr12oeeOyY2BlviTNQlYV5xOj47GirPr4yA1hE9JCtxfQN0+tVbkxwCtYDQWhEKWFHsEK48ORg5jrouCAg==}
+    engines: {node: '>=20'}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -2205,6 +2216,10 @@ snapshots:
     dependencies:
       cross-spawn: 7.0.6
 
+  '@posthog/core@1.23.1':
+    dependencies:
+      cross-spawn: 7.0.6
+
   '@rolldown/pluginutils@1.0.0-rc.3': {}
 
   '@rollup/rollup-android-arm-eabi@4.57.1':
@@ -2282,7 +2297,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.57.1':
     optional: true
 
-  '@skybridge/devtools@0.31.4':
+  '@skybridge/devtools@0.33.0':
     dependencies:
       cors: 2.8.6
       express: 5.2.1
@@ -2881,7 +2896,7 @@ snapshots:
 
   inherits@2.0.4: {}
 
-  ink@6.7.0(@types/react@19.2.14)(react@19.2.4):
+  ink@6.8.0(@types/react@19.2.14)(react@19.2.4):
     dependencies:
       '@alcalzone/ansi-tokenize': 0.2.5
       ansi-escapes: 7.3.0
@@ -2900,7 +2915,7 @@ snapshots:
       react-reconciler: 0.33.0(react@19.2.4)
       scheduler: 0.27.0
       signal-exit: 3.0.7
-      slice-ansi: 7.1.2
+      slice-ansi: 8.0.0
       stack-utils: 2.0.6
       string-width: 8.1.1
       terminal-size: 4.0.1
@@ -3084,6 +3099,10 @@ snapshots:
     dependencies:
       '@posthog/core': 1.22.0
 
+  posthog-node@5.24.17:
+    dependencies:
+      '@posthog/core': 1.23.1
+
   proxy-addr@2.0.7:
     dependencies:
       forwarded: 0.2.0
@@ -3264,21 +3283,21 @@ snapshots:
 
   sisteransi@1.0.5: {}
 
-  skybridge@0.31.4(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))(@skybridge/devtools@0.31.4)(@types/react@19.2.14)(nodemon@3.1.11)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))(vite@7.3.1(@types/node@25.2.3)(tsx@4.21.0)):
+  skybridge@0.33.0(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))(@skybridge/devtools@0.33.0)(@types/react@19.2.14)(nodemon@3.1.11)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))(vite@7.3.1(@types/node@25.2.3)(tsx@4.21.0)):
     dependencies:
       '@babel/core': 7.29.0
       '@modelcontextprotocol/sdk': 1.26.0(zod@4.3.6)
       '@oclif/core': 4.8.0
-      '@skybridge/devtools': 0.31.4
+      '@skybridge/devtools': 0.33.0
       ci-info: 4.4.0
       cors: 2.8.6
       dequal: 2.0.3
       es-toolkit: 1.44.0
       express: 5.2.1
       handlebars: 4.7.8
-      ink: 6.7.0(@types/react@19.2.14)(react@19.2.4)
+      ink: 6.8.0(@types/react@19.2.14)(react@19.2.4)
       nodemon: 3.1.11
-      posthog-node: 5.24.15
+      posthog-node: 5.24.17
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
       superjson: 2.2.6
@@ -3294,6 +3313,11 @@ snapshots:
       - utf-8-validate
 
   slice-ansi@7.1.2:
+    dependencies:
+      ansi-styles: 6.2.3
+      is-fullwidth-code-point: 5.1.0
+
+  slice-ansi@8.0.0:
     dependencies:
       ansi-styles: 6.2.3
       is-fullwidth-code-point: 5.1.0

@@ -52,6 +52,11 @@ Create a project at [clerk.com/dashboard](https://clerk.com/dashboard). You'll n
 - **Secret Key** (`CLERK_SECRET_KEY`)
 - **Publishable Key** (`CLERK_PUBLISHABLE_KEY`)
 
+Enable Dynamic Client Registration (DCR) in the Clerk Dashboard:
+
+1. Go to **Configure** > **Developers** > **OAuth applications** > **Settings**
+2. Toggle on **Dynamic client registration**
+
 ### Claude Code (optional, for AI-assisted development)
 
 [docs.anthropic.com/en/docs/claude-code/overview](https://docs.anthropic.com/en/docs/claude-code/overview)
