@@ -44,13 +44,23 @@ function KnowledgeGraph() {
   const [displayMode, requestDisplayMode] = useDisplayMode();
   const containerRef = useRef<HTMLDivElement>(null);
   const networkRef = useRef<Network | null>(null);
+  const nodesDataRef = useRef<DataSet<any> | null>(null);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [stats, setStats] = useState({ nodes: 0, edges: 0 });
+  const outputRef = useRef<GraphData | null>(null);
 
+  // Store output in ref to avoid re-initialization on re-renders
+  if (output && !outputRef.current) {
+    outputRef.current = output as GraphData;
+  }
+
+  // Initialize network only once when output is available
   useEffect(() => {
-    if (!containerRef.current || !output) return;
+    if (!containerRef.current || !outputRef.current) return;
+    // Skip if already initialized
+    if (networkRef.current) return;
 
-    const graphData = output as GraphData;
+    const graphData = outputRef.current;
     if (!graphData.nodes || !graphData.edges) return;
 
     setStats({ nodes: graphData.nodes.length, edges: graphData.edges.length });
@@ -80,6 +90,8 @@ function KnowledgeGraph() {
         };
       }),
     );
+
+    nodesDataRef.current = nodes;
 
     const edges = new DataSet(
       graphData.edges.map((edge) => ({
@@ -142,11 +154,6 @@ function KnowledgeGraph() {
       },
     };
 
-    // Clean up previous network
-    if (networkRef.current) {
-      networkRef.current.destroy();
-    }
-
     // Create network
     const network = new Network(
       containerRef.current,
@@ -157,7 +164,7 @@ function KnowledgeGraph() {
     network.on("click", (params) => {
       if (params.nodes.length > 0) {
         const nodeId = params.nodes[0];
-        const nodeData = nodes.get(nodeId) as any;
+        const nodeData = nodesDataRef.current?.get(nodeId) as any;
         if (nodeData?._data) {
           setSelectedNode(nodeData._data);
         }
@@ -170,8 +177,9 @@ function KnowledgeGraph() {
 
     return () => {
       network.destroy();
+      networkRef.current = null;
     };
-  }, [output, isDark]);
+  }, [output]); // Only re-run when output first arrives
 
   const handleZoomIn = () => {
     if (networkRef.current) {
