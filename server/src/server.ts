@@ -2,6 +2,7 @@ import { McpServer } from "skybridge/server";
 import { z } from "zod";
 import { env } from "./env.js";
 import { executeActions, fetchTasks } from "./supabase.js";
+import { fetchFullGraph } from "./neo4j.js";
 
 const SERVER_URL = "http://localhost:3000";
 
@@ -208,6 +209,60 @@ const server = new McpServer(
           },
         ],
       };
+    },
+  )
+  .registerWidget(
+    "knowledge-graph",
+    {
+      description: "Visualize and explore a Neo4j knowledge graph",
+    },
+    {
+      description:
+        "Opens an interactive visualization of the Lord of the Rings knowledge graph. Shows characters, locations, items, events, and their relationships.",
+      inputSchema: {},
+      annotations: {
+        readOnlyHint: true,
+        openWorldHint: false,
+        destructiveHint: false,
+      },
+    },
+    async () => {
+      try {
+        const graphData = await fetchFullGraph();
+
+        const nodeCount = graphData.nodes.length;
+        const edgeCount = graphData.edges.length;
+
+        // Group nodes by type for summary
+        const nodeTypes: Record<string, number> = {};
+        for (const node of graphData.nodes) {
+          nodeTypes[node.type] = (nodeTypes[node.type] || 0) + 1;
+        }
+
+        const typeSummary = Object.entries(nodeTypes)
+          .map(([type, count]) => `${count} ${type}`)
+          .join(", ");
+
+        return {
+          structuredContent: graphData,
+          content: [
+            {
+              type: "text",
+              text: `Knowledge Graph loaded: ${nodeCount} nodes (${typeSummary}), ${edgeCount} relationships.`,
+            },
+          ],
+        };
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Error loading knowledge graph: ${error instanceof Error ? error.message : "Unknown error"}`,
+            },
+          ],
+          isError: true,
+        };
+      }
     },
   );
 
