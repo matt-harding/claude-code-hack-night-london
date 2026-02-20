@@ -1,0 +1,51 @@
+version: "3"
+
+tasks:
+  install:
+    desc: Install dependencies
+    cmds:
+      - pnpm install
+
+  dev:
+    desc: Start the dev server
+    cmds:
+      - pnpm dev
+
+  neo4j:
+    desc: Start Neo4j database
+    cmds:
+      - docker-compose up -d
+      - 'echo "Neo4j starting... Browser: http://localhost:7474 | Credentials: neo4j / password123"'
+
+  neo4j:stop:
+    desc: Stop Neo4j database
+    cmds:
+      - docker-compose down
+
+  neo4j:logs:
+    desc: View Neo4j logs
+    cmds:
+      - docker-compose logs -f neo4j
+
+  seed:
+    desc: Seed Neo4j with sample data
+    cmds:
+      - 'echo "Seeding Neo4j with sample data..."'
+      - docker exec -i neo4j-hacknight cypher-shell -u neo4j -p password123 < scripts/seed.cypher
+
+  tunnel:
+    desc: Start Cloudflare tunnel for external access
+    cmds:
+      - cloudflared tunnel --url http://localhost:3000
+
+  clean:
+    desc: Clean up everything
+    cmds:
+      - docker-compose down -v
+      - rm -rf node_modules
+
+  start:
+    desc: Start everything (Neo4j + dev server)
+    deps: [neo4j]
+    cmds:
+      - pnpm dev

@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  neo4j:
+    image: neo4j:5
+    container_name: neo4j-hacknight
+    ports:
+      - "7474:7474" # HTTP (browser)
+      - "7687:7687" # Bolt (driver)
+    environment:
+      - NEO4J_AUTH=neo4j/password123
+      - NEO4J_PLUGINS=["apoc"]
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7474"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
