@@ -1,8 +1,8 @@
 {
-  "name": "claude-hacknight-starter",
+  "name": "lotr-knowledge-graph",
   "version": "0.0.1",
   "private": true,
-  "description": "Alpic MCP Server Template",
+  "description": "Lord of the Rings Knowledge Graph MCP App",
   "type": "module",
   "scripts": {
     "dev": "skybridge dev",
