@@ -1,49 +1,52 @@
-# Claude Hack Night - Task Manager
+# LOTR Knowledge Graph
 
-A task management app built with [Skybridge](https://docs.skybridge.tech), featuring a kanban board with drag-and-drop, status management, and real-time sync via Supabase.
+An interactive Lord of the Rings knowledge graph visualization built with [Skybridge](https://docs.skybridge.tech) and Neo4j. Explore the world of Middle-earth through an interactive graph of characters, locations, items, and events — all rendered inside Claude.
 
-**Try it now in Claude:** add `https://task-manager.alpic.live/mcp` as a remote MCP server in your Claude settings. Requires a Pro, Team, Max, or Enterprise account.
+![Knowledge Graph Preview](Claude_Screenshot.png)
 
-## Hack Night Theme
+## Features
 
-**Build an app that solves an everyday "at work" issue.**
+- **Full Graph Visualization** — View the entire LOTR universe with 56 nodes and 70+ relationships
+- **Interactive Exploration** — Click nodes to see character details, relationships, and properties
+- **Query-Based Filtering** — Search by character name, node type, or relationship type
+- **Real-time Rendering** — Powered by vis-network for smooth, physics-based graph layouts
 
-Use this repo as a starting point and build your own MCP app. Here are some ideas to get you started:
+### What's in the Graph?
 
-- 🔖 **Bookmark Brain** — Save links with your own annotations, retrieve them later by describing what you vaguely remember
-- ⏰ **Deadline Radar** — Store upcoming deadlines with context, ask "what's due this week?"
-- 👋 **Learn Your Teammates** — For newcomers in a company, uses the model to play a "Time's Up" game of who's who
-- 💡 **Pitch Pile** — Dump 'someday' ideas, user feedback, emails, and call notes that shouldn't clutter the roadmap but need to be searchable. Like, aggregate, and sort
-- 🔤 **Acronym Atlas** — A repository for company-specific jargon and internal project codenames that confuse every new hire
-- 📚 **Learning Ledger** — A DB of posts or articles you want to read. Make summaries, find patterns, and quiz yourself
-- 🍕 **Rate Your Nearby Restaurants** — Rate places around the office and get suggestions for where to eat today
+| Category   | Count | Examples                                         |
+| ---------- | ----- | ------------------------------------------------ |
+| Characters | 24    | Frodo, Gandalf, Aragorn, Legolas, Gollum, Sauron |
+| Locations  | 12    | The Shire, Rivendell, Mordor, Minas Tirith       |
+| Races      | 7     | Hobbit, Elf, Dwarf, Human, Wizard, Orc, Ent      |
+| Items      | 7     | The One Ring, Sting, Andúril, Mithril Coat       |
+| Events     | 6     | Council of Elrond, Battle of Helm's Deep         |
+
+### Relationships
+
+Family ties, friendships, alliances, enemies, romance, mentorship, item ownership, battle participation, and more.
 
 ## Prerequisites
 
-### Node.js (v24.13+)
+### Node.js (v24.9+)
 
 - macOS: `brew install node`
 - Linux / other: [nodejs.org/en/download](https://nodejs.org/en/download)
 
 ### pnpm
 
-[pnpm.io/installation](https://pnpm.io/installation)
-
 ```bash
 npm install -g pnpm
 ```
 
-### Supabase CLI
+### Docker (for Neo4j)
 
-- macOS: `brew install supabase/tap/supabase`
-- Linux / other: [supabase.com/docs/guides/cli/getting-started](https://supabase.com/docs/guides/cli/getting-started)
+- macOS: `brew install --cask docker`
+- Linux / other: [docs.docker.com/get-docker](https://docs.docker.com/get-docker/)
 
-### Supabase Project
+### Task Runner (optional, for convenience commands)
 
-Create a project at [supabase.com/dashboard](https://supabase.com/dashboard). You'll need:
-
-- **Project URL** (`SUPABASE_URL`)
-- **Service Role Key** (`SUPABASE_SERVICE_ROLE_KEY`) — found in Settings > API
+- macOS: `brew install go-task`
+- Linux / other: [taskfile.dev/installation](https://taskfile.dev/installation/)
 
 ### Clerk Project
 
@@ -52,20 +55,12 @@ Create a project at [clerk.com/dashboard](https://clerk.com/dashboard). You'll n
 - **Secret Key** (`CLERK_SECRET_KEY`)
 - **Publishable Key** (`CLERK_PUBLISHABLE_KEY`)
 
-Enable Dynamic Client Registration (DCR) in the Clerk Dashboard:
+Enable Dynamic Client Registration (DCR):
 
 1. Go to **Configure** > **Developers** > **OAuth applications** > **Settings**
 2. Toggle on **Dynamic client registration**
 
-### Claude Code (optional, for AI-assisted development)
-
-[docs.anthropic.com/en/docs/claude-code/overview](https://docs.anthropic.com/en/docs/claude-code/overview)
-
-```bash
-npm install -g @anthropic-ai/claude-code
-```
-
-## Setup
+## Quick Start
 
 **1. Install dependencies**
 
@@ -79,75 +74,99 @@ pnpm i
 cp .env.example .env
 ```
 
-Fill in your keys:
+Fill in your Clerk keys:
 
 ```
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 CLERK_SECRET_KEY=sk_test_xxxxx
 CLERK_PUBLISHABLE_KEY=pk_test_xxxxx
 ```
 
-**3. Link your Supabase project and push migrations**
+**3. Start Neo4j and seed the database**
 
 ```bash
-supabase link
-supabase db push
-```
+# Using Task runner (recommended)
+task neo4j   # Start Neo4j container
+task seed    # Load LOTR data
 
-This creates the `tasks` table and the `toggle_task` RPC function.
+# Or manually
+docker-compose up -d
+cat scripts/seed.cypher | docker exec -i neo4j cypher-shell -u neo4j -p password123
+```
 
 **4. Start the dev server**
 
 ```bash
 pnpm dev
+# Or: task dev
 ```
 
-The server runs at `http://localhost:3000`. For testing, we recommend using the Skybridge devtools available at [http://localhost:3000](http://localhost:3000) (no `/mcp` suffix).
+**5. Open DevTools**
+
+Visit [http://localhost:3000](http://localhost:3000) to test locally.
 
 ## Connecting to Claude
 
-When you're ready to test with Claude, tunnel your local server with [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/) to expose the MCP endpoint at `/mcp`:
+Tunnel your local server with [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/):
 
 ```bash
 cloudflared tunnel --url http://localhost:3000
+# Or: task tunnel
 ```
 
-Then add your tunnel URL with `/mcp` appended (e.g. `https://xxx.trycloudflare.com/mcp`) as a remote MCP server in Claude settings.
+Add your tunnel URL with `/mcp` appended (e.g. `https://xxx.trycloudflare.com/mcp`) as a remote MCP server in Claude settings.
 
-## Supabase Commands
+### Example Prompts
+
+Once connected, try asking Claude:
+
+- "Show me the knowledge graph"
+- "Query the graph for Gandalf and his connections"
+- "Show me all the hobbits in the Fellowship"
+- "What items does Frodo carry?"
+
+## Task Commands
 
 ```bash
-# Link your local project to a remote Supabase project (required once)
-supabase link
-
-# Push local migrations to the remote database
-supabase db push
-
-# Reset the remote database (drops all data, re-applies migrations)
-supabase db reset --linked
-
-# Create a new migration file
-supabase migration new <migration_name>
-
-# Check migration status
-supabase migration list
+task neo4j    # Start Neo4j database
+task seed     # Load LOTR seed data
+task dev      # Start dev server
+task tunnel   # Start Cloudflare tunnel
+task start    # Start both Neo4j and dev server
 ```
 
-Migrations live in `supabase/migrations/`. After editing or adding a migration file, run `supabase db push` to apply it to your remote database.
+## Project Structure
+
+```
+├── server/src/
+│   ├── server.ts      # MCP widget registrations
+│   ├── neo4j.ts       # Neo4j queries and connection
+│   └── env.ts         # Environment configuration
+├── web/src/widgets/
+│   ├── knowledge-graph.tsx  # Full graph visualization
+│   └── query-graph.tsx      # Filtered graph queries
+├── scripts/
+│   └── seed.cypher    # LOTR knowledge graph data
+└── docker-compose.yml # Neo4j container config
+```
+
+## Tech Stack
+
+- **[Skybridge](https://docs.skybridge.tech/)** — MCP framework for building Claude apps
+- **[Neo4j](https://neo4j.com/)** — Graph database
+- **[vis-network](https://visjs.github.io/vis-network/docs/network/)** — Graph visualization
+- **[Clerk](https://clerk.com/)** — OAuth authentication
 
 ## Deploy to Production
 
-Use [Alpic](https://alpic.ai/) to deploy your app to production:
+Use [Alpic](https://alpic.ai/) to deploy:
 
 [![Deploy on Alpic](https://assets.alpic.ai/button.svg)](https://app.alpic.ai/new/clone?repositoryUrl=https%3A%2F%2Fgithub.com%2Falpic-ai%2Fclaude-hacknight-starter-20-02-2026)
 
-Then add your deployed URL with `/mcp` appended (e.g. `https://your-app-name.alpic.live/mcp`) as a remote MCP server in Claude settings.
+Note: You'll need to configure a managed Neo4j instance (e.g., Neo4j AuraDB) for production.
 
 ## Resources
 
 - [Skybridge Documentation](https://docs.skybridge.tech/)
-- [Apps SDK Documentation](https://developers.openai.com/apps-sdk)
+- [Neo4j Documentation](https://neo4j.com/docs/)
 - [MCP Apps Documentation](https://github.com/modelcontextprotocol/ext-apps/tree/main)
-- [Model Context Protocol Documentation](https://modelcontextprotocol.io/)
-- [Alpic Documentation](https://docs.alpic.ai/)
+- [Model Context Protocol](https://modelcontextprotocol.io/)
